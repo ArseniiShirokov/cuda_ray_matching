@@ -12,8 +12,29 @@
 #include <render_options.h>
 #include <postprocessing.h>
 #include <scene.h>
-
+#include <ctime> 
 #include <iostream>
+
+#define checkCudaErrors(val) check_cuda((val), #val, __FILE__, __LINE__)
+
+
+void check_cuda(cudaError_t result, 
+                char const *const func, 
+                const char *const file, 
+                int const line) {
+    if(result) {
+        std::cerr << "CUDA error = "<< static_cast<unsigned int>(result) << " at " <<
+        file << ":" << line << " '" << func << "' \n";
+        cudaDeviceReset();
+        exit(99);
+    }
+}
+
+
+__global__ void helloCUDA()
+{
+    printf("Hello, CUDA!\n");
+}
 
 
 Vector RayCast(const Scene& scene, Ray& view_ray, RenderOptions opt) {
@@ -50,6 +71,9 @@ Image Render(const Scene& scene, const CameraOptions& camera_options, const Rend
     Image img(camera_options.screen_width, camera_options.screen_height);
     Transformer transformer(camera_options);
 
+    std::time_t tic = std::time(NULL);
+    std::cout << "Start running at: " << std::asctime(std::localtime(&tic)) << std::endl;
+
     std::vector<std::vector<Vector>> color_map(img.Height(), std::vector<Vector>(img.Width()));
     for (int i = 0; i < img.Height(); ++i) {
         for (int j = 0; j < img.Width(); ++j) {
@@ -57,7 +81,19 @@ Image Render(const Scene& scene, const CameraOptions& camera_options, const Rend
             color_map[i][j] = RayCast(scene, view_ray, render_options);
         }
     }
-    std::cout << "GPU time " << "\n";
+
+    int tx = 16;
+    int ty = 16;
+    dim3 blocks(img.Width() / tx + 1, img.Height() / ty + 1);
+    dim3 threads(tx, ty);
+    helloCUDA<<<blocks, threads>>>();
+    checkCudaErrors(cudaGetLastError());
+    checkCudaErrors(cudaDeviceSynchronize());
+
+    std::time_t toc = std::time(NULL);
+    std::cout << "Finish running at: " << std::asctime(std::localtime(&toc)) << std::endl;
+    std::cout << "Time consuming: " << toc - tic << "s" << std::endl;
+
     PostProc(img, color_map);
     return img;
 }
