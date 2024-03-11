@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cuda_runtime.h>
 #include <image.h>
 #include <camera_options.h>
 #include <string>
@@ -9,7 +10,7 @@
 #include <ray.h>
 #include <cmath>
 #include <transformer.h>
-#include <render_options.h>
+#include "render_options.h"
 #include <postprocessing.h>
 #include <scene.h>
 #include <ctime> 
@@ -31,9 +32,10 @@ void check_cuda(cudaError_t result,
 }
 
 
-__global__ void helloCUDA()
-{
-    printf("Hello, CUDA!\n");
+__global__ void helloCUDA() {
+    int x = threadIdx.x + blockIdx.x * blockDim.x;
+    int y = threadIdx.y + blockIdx.y * blockDim.y;
+    //printf("Pixel %d, %d\n", x, y);
 }
 
 
@@ -82,8 +84,8 @@ Image Render(const Scene& scene, const CameraOptions& camera_options, const Rend
         }
     }
 
-    int tx = 16;
-    int ty = 16;
+    int tx = 8;
+    int ty = 8;
     dim3 blocks(img.Width() / tx + 1, img.Height() / ty + 1);
     dim3 threads(tx, ty);
     helloCUDA<<<blocks, threads>>>();
