@@ -71,7 +71,6 @@ Image Render(Scene** device_scene, const CameraOptions& camera_options, const Re
     Image img(camera_options.screen_width, camera_options.screen_height);
     Transformer transformer(camera_options);
 
-<<<<<<< HEAD
     // Start time estimation
     float elapsed_all=0;
     cudaEvent_t start_all, stop_all;
@@ -86,8 +85,6 @@ Image Render(Scene** device_scene, const CameraOptions& camera_options, const Re
     // Memory transfer
 
     checkCudaErrors(cudaEventRecord(start_all, 0));
-=======
->>>>>>> f0c852973a14c5f53a6b3e3ed9bfec570456208e
     int tx = 8;
     int ty = 8;
     dim3 blocks(img.Height() / tx + 1, img.Width() / ty + 1);
@@ -104,28 +101,21 @@ Image Render(Scene** device_scene, const CameraOptions& camera_options, const Re
     Vector *device_results;
     checkCudaErrors(cudaMalloc((void**)&device_results, img.Width() * img.Height() * sizeof(Vector)));
 
-<<<<<<< HEAD
     // Run kernel
     checkCudaErrors(cudaEventRecord(start, 0));
 
-=======
->>>>>>> f0c852973a14c5f53a6b3e3ed9bfec570456208e
     RayCastCUDA<<<blocks, threads>>>(device_scene, device_render_options, device_transformer, device_results, img.Width());
     checkCudaErrors(cudaGetLastError());
+    checkCudaErrors(cudaDeviceSynchronize());
 
-<<<<<<< HEAD
     checkCudaErrors(cudaEventRecord(stop, 0));
     checkCudaErrors(cudaEventSynchronize (stop));
     checkCudaErrors(cudaEventElapsedTime(&elapsed, start, stop));
 
-=======
-    checkCudaErrors(cudaDeviceSynchronize());
->>>>>>> f0c852973a14c5f53a6b3e3ed9bfec570456208e
     Vector *results = (Vector*) malloc(img.Width() * img.Height() * sizeof(Vector));
     checkCudaErrors(cudaMemcpy(results, device_results, img.Width() * img.Height() * sizeof(Vector), cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaFree(device_render_options));
     checkCudaErrors(cudaFree(device_transformer));
-<<<<<<< HEAD
 
     checkCudaErrors(cudaEventRecord(stop_all, 0));
     checkCudaErrors(cudaEventSynchronize(stop_all));
@@ -139,9 +129,6 @@ Image Render(Scene** device_scene, const CameraOptions& camera_options, const Re
     std::cout << "All time " << elapsed_all * 0.001 << "\n";
     std::cout << "Kernel time " << elapsed * 0.001 << "\n\n";
 
-=======
-
->>>>>>> f0c852973a14c5f53a6b3e3ed9bfec570456208e
     std::vector<std::vector<Vector>> color_map(img.Height(), std::vector<Vector>(img.Width()));
     for (int i = 0; i < img.Width() * img.Height(); ++i) {
         color_map[i / img.Width()][i % img.Width()] = results[i];
