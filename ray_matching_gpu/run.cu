@@ -24,6 +24,7 @@ void SaveImage(const std::string& result_filename, Image& image) {
 
 __global__ void build_scene_1(Scene **scene) {
     if (threadIdx.x == 0 && blockIdx.x == 0) {
+<<<<<<< HEAD
         auto center = Vector{5, 5, -16};
         auto color = Vector{1, 1, 0};
         auto sphere1 = new Sphere(center, 1, color);
@@ -40,6 +41,15 @@ __global__ void build_scene_1(Scene **scene) {
         objects[0] = object;
         objects[1] = sphere1;
         objects[2] = sphere2;
+=======
+        auto center = Vector{0, -0, -20};
+        auto color = Vector{1, 1, 1};
+        auto object = new Sierpinski(center, 5, color);
+
+        int num_obj = 1;
+        SDF* objects[1];
+        objects[0] = object;
+>>>>>>> f0c852973a14c5f53a6b3e3ed9bfec570456208e
         auto sdfs = new UnionSDF(objects, num_obj);
 
         auto position = Vector{-4, 5, -1.0};
@@ -92,6 +102,7 @@ int main() {
     }
 
     {
+<<<<<<< HEAD
         // Base part camera movement
         float fov = M_PI / 3;
         Vector look_from = Vector(-12.0f, -5.0f, -6.0f);
@@ -110,6 +121,8 @@ int main() {
     }
 
     {
+=======
+>>>>>>> f0c852973a14c5f53a6b3e3ed9bfec570456208e
         // Spheres
         CameraOptions camera_opts(512, 512);
         RenderOptions render_opts;
