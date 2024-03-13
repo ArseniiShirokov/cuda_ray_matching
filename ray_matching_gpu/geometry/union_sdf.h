@@ -3,34 +3,45 @@
 #include <vector.h>
 #include <sdf.h>
 
+
+#define min(a,b) ((a)<(b)?(a):(b))
+#define max(a,b) ((a)>(b)?(a):(b))
+
+
 class UnionSDF : public SDF{
 public:
-    UnionSDF(){};
-    UnionSDF(std::vector<SDF*> objects) : objects_(std::move(objects)){};
-    UnionSDF(std::vector<SDF*> objects, const Vector& color) : SDF(color), objects_(std::move(objects)){};
+     __device__ UnionSDF(){};
+     __device__ UnionSDF(SDF** objects, int num_obj, const Vector& color = Vector(0, 0, 0)) : SDF(color) {
+        num_obj_ = num_obj;
+        objects_ = new SDF*[num_obj];
+        for (int i = 0; i < num_obj_; i++) {
+            objects_[i] = objects[i];
+        }
+    };
 
-    double ComputeSdf(const Vector &point) const override{
-        double dist = 1e+5;
-        for (auto& obj : objects_) {
-            dist = std::min(dist, obj->ComputeSdf(point));
+    __device__ float ComputeSdf(const Vector &point) const override{
+        float dist = 1e+5;
+        for (int i = 0; i < num_obj_; i++) {
+            dist = min(dist, objects_[i]->ComputeSdf(point));
         }
         return dist;
     }
 
-    const SDF* GetHittedObject(const Vector &point) const {
-        double min_dist = 1e+5;
+    __device__ const SDF* GetHittedObject(const Vector &point) const {
+        float min_dist = 1e+5;
         SDF* hitted_object;
 
-        for (auto& obj : objects_) {
-            double dist = obj->ComputeSdf(point);
+        for (int i = 0; i < num_obj_; i++) {
+            float dist = objects_[i]->ComputeSdf(point);
             if (dist < min_dist) {
                 min_dist = dist;
-                hitted_object = obj;
+                hitted_object = objects_[i];
             }
         }
         return hitted_object;
     }
 
 private:
-    std::vector<SDF*> objects_;
+    SDF** objects_;
+    int num_obj_;
 };

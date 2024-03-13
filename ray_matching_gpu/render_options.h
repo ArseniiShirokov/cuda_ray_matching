@@ -1,8 +1,8 @@
 #pragma once
 
 struct RenderOptions {
-    double max_range = 100;
-    double min_step = 0.001;
-    double eps = 1e-4;
+    float max_range = 100;
+    float min_step = 0.001;
+    float eps = 1e-4;
 };
 

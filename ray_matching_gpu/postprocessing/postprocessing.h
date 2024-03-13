@@ -1,13 +1,15 @@
 #include <image.h>
+#include <iostream>
+
 
 void PostProc(Image& img, std::vector<std::vector<Vector>>& color_map) {
-    double max_value = 0;
+    float max_value = 0;
     // Tone mapping
     for (int i = 0; i < img.Height(); ++i) {
         for (int j = 0; j < img.Width(); ++j) {
-            max_value = std::max(max_value, color_map[i][j][0]);
-            max_value = std::max(max_value, color_map[i][j][1]);
-            max_value = std::max(max_value, color_map[i][j][2]);
+            max_value = max(max_value, color_map[i][j][0]);
+            max_value = max(max_value, color_map[i][j][1]);
+            max_value = max(max_value, color_map[i][j][2]);
         }
     }
     for (int i = 0; i < img.Height(); ++i) {

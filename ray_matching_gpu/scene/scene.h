@@ -12,21 +12,21 @@
 
 class Scene {
 public:
-    Scene(std::vector<SDF*> objects, Light light)
-        : union_object_(std::move(objects)),
+    __host__ __device__ Scene(UnionSDF* union_object, Light light)
+        : union_object_(union_object),
           light_(light) {
     }
 
-    const UnionSDF* GetUnionObject() const {
-        return &union_object_;
+    __device__ const UnionSDF* GetUnionObject() const {
+        return union_object_;
     }
 
-    const Light& GetLight() const {
+    __device__ const Light& GetLight() const {
         return light_;
     }
 
 
 private:
-    UnionSDF union_object_;
+    UnionSDF* union_object_;
     Light light_;
 };

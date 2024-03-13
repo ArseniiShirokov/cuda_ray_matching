@@ -3,37 +3,49 @@
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
-make test_diff_sdf
-./test_diff_sdf
+make test_ray_matching
+make test_ray_matching_gpu
 ```
-В результате запустятся 7 тестов:
 
-#### Недефиринцируемый рендер сцены (3 балла):
-    Тест 1
-        Рендеринг sdf: "sdf_render.png"
-       
-    Тест 2
-        Рендеринг меша: "mesh_render.png"
 
-#### Differentiable SDF rendering (6 баллов):
-    Тест 3
-        Оптимизация фигур: "sdf_opt.png"
-        
-    Тест 4
-        AC/DC лого: "acdc_opt.png"
+### Run RayMatching on CPU 
+```console
+./test_ray_matching
+```
 
-#### Производные по цвету и текстурам меша (6 баллов)
-    Тест 5 "texture_opt.png"
+Results you can find in ray_matching/results
 
-#### Edge sampling (7 баллов):
-    Тест 6 "edge_sampling.png"
+### Run RayMatching on CPU 
+```console
+./test_ray_matching_gpu
+```
 
-#### Пункт 6 (большая текстура):
-    Тест 7 "big_texture_opt.png"
-    Текстура была увеличена до 128x128, в результате:
-        * Потребовалось чуть больше эпох для достижения нужной точности
-        * Время на 1 эпоху незначительно увеличилось
+Results you can find in ray_matching_gpu/results
 
-Результаты всех тестов сохраняются в папку "diff_sdf/results".
+### Perfomance estimation
 
-#### Итого: 23 балла + 2 субъективных балла за доп. заслуги (автматизация  проверки) на твое усмотрение.
+#### CPU
+| OMP_NUM_THREADS | time, s  |
+|-----------------|----------|
+| 1               | 0.550028 |
+| 4               | 0.16358  |
+| 8               | 0.107724 |
+
+#### CUDA
+| CUDA            | time, s   |
+|-----------------|-----------|
+| Full            | 0.0144295 |
+| Kernel          | 0.0107233 |
+| Memory transfer | 0.0037062 |
+
+
+### Score
+1. Base part - 10 
+2. Camera params (look_from, look_to, fov) - 1
+3. Unuque color for each object - 1
+4. Cool scene with packman eating sierpinski tetrahedron  - 1
+
+Total: 13
+
+### Example 
+![alt text](ray_matching_gpu/results/base_gpu.png "Packman eating sierpinski tetrahedron")

@@ -4,34 +4,43 @@
 #include <sdf.h>
 #include <vector>
 
+#define min(a,b) ((a)<(b)?(a):(b))
+#define max(a,b) ((a)>(b)?(a):(b))
+
+
+__device__ float cuda_fabs(float a) {
+    return a >= 0 ? a : -a;
+}
+
+
 class Sierpinski : public SDF{
 public:
     Sierpinski(){};
 
-    Sierpinski(Vector center, double size, const Vector& color = {0, 0, 0}) : SDF(color), center_(center), size_(size){
-        vertices.push_back(Vector{1, 1, 1});
-        vertices.push_back(Vector{-1, -1, 1});
-        vertices.push_back(Vector{1, -1, -1});
-        vertices.push_back(Vector{-1, 1, -1});
+    __device__ Sierpinski(Vector center, float size, const Vector& color = {0, 0, 0}) : SDF(color), center_(center), size_(size){
+        vertices[0] = Vector(1, 1, 1);
+        vertices[1] = Vector(-1, -1, 1);
+        vertices[2] = Vector(1, -1, -1);
+        vertices[3] = Vector(-1, 1, -1);
         level_ = 3;
     };
 
 
-    Vector Transform2Local(const Vector &point) const {
+    __device__ Vector Transform2Local(const Vector &point) const {
         return (point - center_) / size_;
     }
 
-    Vector Fold(const Vector &point, const Vector& pointOnPlane, const Vector& planeNormal) const {
+    __device__ Vector Fold(const Vector &point, const Vector& pointOnPlane, const Vector& planeNormal) const {
         // Center plane on origin for distance calculation
-        double distToPlane = DotProduct(point - pointOnPlane, planeNormal);
+        float distToPlane = DotProduct(point - pointOnPlane, planeNormal);
         
         // We only want to reflect if the dist is negative
-        distToPlane = std::min(distToPlane, 0.0);
+        distToPlane = min(distToPlane, 0.0);
         return point - 2.0 * distToPlane * planeNormal;
     }
 
-    double ComputeSdf(const Vector& point) const override{
-        double scale = 1.0;
+    __device__ float ComputeSdf(const Vector& point) const override{
+        float scale = 1.0;
         Vector cur_point = Transform2Local(point);
 
         for (int i = 0; i < level_; i++) {
@@ -54,15 +63,15 @@ public:
         // Now that the space has been distorted by the IFS,
         // just return the distance to a tetrahedron
         // Divide by scale accumulator to correct the distance field
-        auto len =  (std::max(std::abs(cur_point[0] + cur_point[1]) - cur_point[2],
-            std::abs(cur_point[0] - cur_point[1]) + cur_point[2]) - 1.0) / std::sqrt(3.);
+        auto len =  (max(cuda_fabs(cur_point[0] + cur_point[1]) - cur_point[2],
+            cuda_fabs(cur_point[0] - cur_point[1]) + cur_point[2]) - 1.0f) / 1.73205f; // 1.73205 == std::sqrt(3.)
         return size_ * len / scale;
     }
 
 private:
     Vector center_;
-    double size_;
+    float size_;
 
-    std::vector<Vector> vertices;
+    Vector vertices[4];
     int level_;
 };

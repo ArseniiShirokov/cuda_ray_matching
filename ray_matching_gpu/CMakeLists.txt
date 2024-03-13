@@ -1,3 +1,5 @@
+find_package(CUDA REQUIRED)
+
 add_definitions(-w)
 cuda_add_executable(test_ray_matching_gpu run.cu)
 
