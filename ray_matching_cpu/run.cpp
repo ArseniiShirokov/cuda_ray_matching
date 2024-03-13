@@ -31,9 +31,9 @@ TEST_CASE("sphere", "[ray_matching]") {
     CameraOptions camera_opts(512, 512);
     RenderOptions render_opts;
 
-    auto center = Vector{0, 0, -50};
+    auto center = Vector{-3, -3, -5};
     auto color = Vector{0, 1, 0};
-    auto object = new Sphere(center, 5, color);
+    auto object = new Sphere(center, 1, color);
 
     auto center2 = Vector{5, 5, -25};
     auto color2 = Vector{1, 0, 0};
@@ -58,9 +58,9 @@ TEST_CASE("base", "[ray_matching]") {
     CameraOptions camera_opts(1280, 720);
     RenderOptions render_opts;
 
-    auto center = Vector{0, -0, -2};
+    auto center = Vector{0, -0, -20};
     auto color = Vector{1, 1, 1};
-    auto object = new Sierpinski(center, 1, color);
+    auto object = new Sierpinski(center, 5, color);
     
     std::vector<SDF*> objects;
     objects.push_back(object);

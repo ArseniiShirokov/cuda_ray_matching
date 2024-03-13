@@ -4,14 +4,14 @@
 
 class Ray {
 public:
-    Ray(Vector origin, Vector direction) : origin_(origin), direction_(direction){};
-    const Vector& GetOrigin() const {
+    __device__ Ray(Vector origin, Vector direction) : origin_(origin), direction_(direction){};
+    __device__ const Vector& GetOrigin() const {
         return origin_;
     };
-    const Vector& GetDirection() const {
+    __device__ const Vector& GetDirection() const {
         return direction_;
     };
-    void ShiftOrigin(double t) {
+    __device__ void ShiftOrigin(float t) {
         origin_ += t * direction_;
     }
 

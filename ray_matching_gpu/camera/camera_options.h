@@ -2,23 +2,23 @@
 
 #include <array>
 #include <cmath>
+#include <vector.h>
 
 struct CameraOptions {
     int screen_width;
     int screen_height;
     double fov;
-    std::array<double, 3> look_from;
-    std::array<double, 3> look_to;
+    Vector look_from;
+    Vector look_to;
 
-    CameraOptions(int width, int height, double fov = M_PI / 2,
-                  std::array<double, 3> look_from = {0.0, 0.0, 0.0},
-                  std::array<double, 3> look_to = {0.0, 0.0, -1.0})
+    CameraOptions(int width, int height, float fov = M_PI / 2,
+                  Vector look_from = Vector(0.0f, 0.0f, 0.0f),
+                  Vector look_to = Vector(0.0f, 0.0f, -1.0f))
         : screen_width(width),
           screen_height(height),
           fov(fov),
-          look_from(std::move(look_from)),
-          look_to(std::move(look_to))
-
+          look_from(look_from),
+          look_to(look_to)
     {
     }
 };
